@@ -4,6 +4,7 @@ FROM openjdk:${JAVA_VERSION}-jre AS builder
 
 ARG BWHC_APP
 ARG BWHC_ZIP=$BWHC_APP.zip
+ARG BWHC_APP_DIR=bwhc-backend
 
 COPY $BWHC_ZIP /opt/
 
@@ -43,14 +44,16 @@ ENV N_RANDOM_FILES=-1
 
 USER 999
 
-COPY --from=builder /opt/$BWHC_APP /opt/$BWHC_APP
+COPY --from=builder /opt/$BWHC_APP_DIR /opt/$BWHC_APP_DIR
 
 VOLUME $BWHC_DATA_DIR
 VOLUME $BWHC_CONFIG_DIR
 
 EXPOSE 9000
 
-ENTRYPOINT /opt/$BWHC_APP/bin/bwhc-rest-api-gateway \
+RUN ls /opt
+
+ENTRYPOINT /opt/$BWHC_APP_DIR/bin/bwhc-rest-api-gateway \
     -Dplay.http.secret.key="$APPLICATION_SECRET" \
     -Dpidfile.path=$PID_FILE \
     -Dbwhc.zpm.site="$ZPM_SITE" \
